@@ -5,81 +5,61 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class BookController extends Controller
+use App\Book;
+use Validator;
+class BookController extends BaseController
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
+        $books = Book::all();
+        return $this->sendResponse($books->toArray(),'Books read Successfully');
     }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
-        //
+        $book = Book::find($id);
+        return $this->sendResponse($book->toArray(),'Book read Successfully');
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function store(Request $request)
     {
-        //
+        $validate = Validator::make($request->all(),[
+            'name'    => 'required|string',
+            'details' => 'required|string',
+        ]);
+        if($validate->fails()){
+            return $this->sendError("validate error",$validate->errors());
+        }
+        $book = Book::create([
+            'name'      => $request->name,
+            'details'   => $request->details,
+        ]);
+        return $this->sendResponse($book->toArray(),'Books created Successfully');
     }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        //
+        $validate = Validator::make($request->all(),[
+            'name'    => 'string',
+            'details' => 'string',
+        ]);
+        if($validate->fails()){
+            return $this->sendError("validate error",$validate->errors());
+        }
+        $book = Book::find($id);
+        $book->name = $request->name;
+        $book->details = $request->details;
+        $book->update();
+        return $this->sendResponse($book->toArray(),'Books updated Successfully');
+    }
+    public function destroy($id)
+    { 
+        $book = Book::find($id);
+        if(is_null($book)){
+            return $this->sendError("error","book not found");
+        }
+        $book->delete();
+
+        return $this->sendResponse($book->toArray(),'Books deleted Successfully');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
+
+       
 }

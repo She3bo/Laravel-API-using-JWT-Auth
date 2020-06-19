@@ -27,8 +27,7 @@ Route::middleware('jwt.auth')->group(function (){
     Route::get('/user', function (Request $request) {
         return new UserResource(auth()->user());//->makeHidden(['created_at','updated_at']));
     });
+
+    Route::resource('/books','API\BookController');
 });
 
-Route::middleware('jwt.auth')->group(function (){
-    Route::resourc('/book','API\BookController');
-});
