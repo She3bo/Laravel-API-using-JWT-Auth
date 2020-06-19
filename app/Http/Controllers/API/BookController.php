@@ -17,6 +17,9 @@ class BookController extends BaseController
     public function show($id)
     {
         $book = Book::find($id);
+        if(is_null($book)){
+            return $this->sendError("error","book not found");
+        }
         return $this->sendResponse($book->toArray(),'Book read Successfully');
     }
     public function store(Request $request)
@@ -44,8 +47,15 @@ class BookController extends BaseController
             return $this->sendError("validate error",$validate->errors());
         }
         $book = Book::find($id);
-        $book->name = $request->name;
-        $book->details = $request->details;
+        if(is_null($book)){
+            return $this->sendError("error","book not found");
+        }
+        if(!empty($request->name)){
+            $book->name = $request->name;
+        }
+        if(!empty($request->details)){
+            $book->details = $request->details;
+        }
         $book->update();
         return $this->sendResponse($book->toArray(),'Books updated Successfully');
     }
