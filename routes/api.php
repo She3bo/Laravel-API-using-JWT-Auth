@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Resources\User as UserResource;
+use App\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,4 +18,17 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::post('/user/register','API\RegistrationController@register');
+Route::post('/user/login','API\RegistrationController@login');
+
+Route::middleware('jwt.auth')->group(function (){
+    Route::get('/user', function (Request $request) {
+        return new UserResource(auth()->user());//->makeHidden(['created_at','updated_at']));
+    });
+});
+
+Route::middleware('jwt.auth')->group(function (){
+    Route::resourc('/book','API\BookController');
 });
